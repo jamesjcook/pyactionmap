@@ -1,0 +1,21 @@
+# packages in environment at C:\Users\dad\Documents\code\py_env\py_env_actionmap:
+#
+# Name                    Version                   Build  Channel
+ca-certificates           2022.4.26            h9f7ea03_0  
+certifi                   2022.6.15        py38h9f7ea03_0  
+libiconv                  1.16                 hc431981_2  
+libxml2                   2.9.14               h3a16499_0  
+libxslt                   1.1.35               hc431981_0  
+lxml                      4.8.0            py38h5abd759_0  
+openssl                   1.1.1o               hc431981_0  
+pip                       21.2.4           py38h9f7ea03_0  
+pyreadline3               3.4.1                     <pip>
+python                    3.8.13               h53c7b84_0  
+setuptools                61.2.0           py38h9f7ea03_0  
+sqlite                    3.38.3               hc431981_0  
+vc                        14.2                 h21ff451_1  
+vs2015_runtime            14.27.29016          h5e58377_2  
+wheel                     0.37.1             pyhd3eb1b0_0  
+wincertstore              0.2              py38h9f7ea03_2  
+xmltodict                 0.12.0             pyhd3eb1b0_0  
+zlib                      1.2.12               h3c9058a_2  

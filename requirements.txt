@@ -1,0 +1,5 @@
+certifi @ file:///C:/ci/certifi_1655907209390/work/certifi
+lxml @ file:///C:/ci/lxml_1646624666819/work
+pyreadline3==3.4.1
+wincertstore==0.2
+xmltodict @ file:///Users/ktietz/demo/mc3/conda-bld/xmltodict_1629301980723/work
