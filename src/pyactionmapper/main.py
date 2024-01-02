@@ -9,7 +9,7 @@ from tkinter import ttk
 import collections
 
 from structure import actionmaps
-from util import VerticalScrolledFrame
+# from util import VerticalScrolledFrame
 class mapper():
     _file=Path(__file__)
     _module=dirname(_file.absolute())

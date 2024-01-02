@@ -10,3 +10,8 @@ Order of the default map matters, this sets the display order.
 
 A "visible" and "map" tag are added in the default map to set which action sets are visible, and their order.
 Also added a "display_name" attribute to actions to override the ugly internal var names for display. 
+
+to run
+- pip install lxml xmltodict 
+- cd pyactionmap 
+- python src\pyactionamp\main.py 
