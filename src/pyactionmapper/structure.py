@@ -1,4 +1,6 @@
 import collections
+from pathlib import Path
+import os
 
 def elem2dict(node, attributes=True):
     """
@@ -59,6 +61,35 @@ def elem2dict2019(node):
             result[key] = value
     return result
 
+# classes arranged from least to most specific.
+class profile():
+    def __init__(self,profile_dir,test_mode=False):
+        self.modified = False
+        self.dir=profile_dir
+        self.name=profile.get_profile_name(self.dir)
+        self.xml_actionmaps=Path(f"{self.dir}/actionmaps.xml")
+        self.actionmaps=actionmaps()
+        self.backup_dir=Path(f"{self.dir}/backups")
+
+    def get_profile_name(profile_dir):
+        # placeholder function to get the profile name given a profile dir.
+        return os.path.basename(profile_dir)
+
+    def load_actionmaps(self,validator=None):
+        # this NOT loaded on init because we might want to slip in an alternate xml_path for xml_actionmaps
+        self.actionmaps=actionmaps()
+        self.actionmaps.load(self.xml_actionmaps,validator)
+    def backup_actionmaps(self):
+        pass
+    def save_actionmaps(self):
+        self.backup_actionmaps()
+        self.actionmaps.save()
+    def restore_backup(profile_dir,xml_file):
+        # get date on current xml,
+        # move currnet xml to backus/date
+        # copy xml_file to self.xml_actionmaps
+        pass
+
 class actionmaps(collections.OrderedDict):
     top_key="ActionMaps"
     main_key="actionmap"
@@ -97,6 +128,14 @@ class actionmaps(collections.OrderedDict):
         if not missing_ok:
             raise ValueError(f"no {lookup} found in {section['name']}")
         return None,-1
+    def load(self, xml_file,validator=None):
+        # lxml handling not complete because conversion from xml to dict is broken.
+        # Decided that that is not a sufficient reason to worry about it.
+        #self.populate(mapper.xml_actionmap, mapper.dtd_actionmap, parser='lxml')
+        self.populate(xml_file, validator=validator, parser='xmltodict')
+        self.validate()
+    def save(self):
+        pass
     def section_names(self):
         # get names of all sections
         vals = [ section["{}name".format(actionmaps.attr_prefix)] for section in self[actionmaps.top_key][actionmaps.main_key] ]
@@ -104,9 +143,9 @@ class actionmaps(collections.OrderedDict):
     def populate(self,input,validator=None,parser='xmltodict'):
         if parser == 'xmltodict':
             import xmltodict
-            with open(input) as defmap:
+            with open(input) as map_h:
                 # This will fail instantly IF malformed xml
-                odict=xmltodict.parse(defmap.read(),
+                odict=xmltodict.parse(map_h.read(),
                     attr_prefix=actionmaps.attr_prefix)
         elif parser == 'lxml':
             from lxml import etree
