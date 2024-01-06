@@ -98,6 +98,7 @@ class actionmaps(collections.OrderedDict):
     def __init__(self, *args, **kwargs):
         super(actionmaps, self).__init__(*args, **kwargs)
         self.order=None
+        self.xml_valid=None
     def validate(self):
         # quasi placeholder 
         top_level=list(self.keys())
@@ -147,20 +148,24 @@ class actionmaps(collections.OrderedDict):
                 # This will fail instantly IF malformed xml
                 odict=xmltodict.parse(map_h.read(),
                     attr_prefix=actionmaps.attr_prefix)
-        elif parser == 'lxml':
+        if parser == 'lxml' or validator is not None:
             from lxml import etree
-            parser = etree.XMLParser(dtd_validation=False)
-            tree = etree.parse(input, parser)
+            lxml_parser = etree.XMLParser(dtd_validation=False)
+            tree = etree.parse(input, lxml_parser)
             if validator is not None:
                 dtd=etree.DTD(validator)
                 if not dtd.validate(tree):
-                    raise ValueError('XML DTD validation failed Errors:{}'.format(
+                    print('XML DTD validation failed Errors:{}'.format(
                     str(dtd.error_log.filter_from_errors())))
+                    self.xml_valid=False
+                    print(f"FAILED Validation! - {input}")
                 else:
-                    print("Validation passed!")
+                    print(f"Validation passed! - {input}")
+                    self.xml_valid=True
             # DERP... ned to unwrap to get into the ordered dict
             #print(tree)
-            odict=elem2dict(tree.getroot())
+            if parser == 'lxml':
+                odict=elem2dict(tree.getroot())
         else:
             raise ValueError(f"Unrecognized xml parser selection {parser}")
         if "visible" in odict[actionmaps.top_key].keys():
