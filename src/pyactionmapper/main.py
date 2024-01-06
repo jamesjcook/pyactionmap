@@ -89,6 +89,7 @@ class mapper():
                 continue
             (u_section,u_map_s_idx)=self.u_map.get_section(section_name)
             if u_section is None:
+                print(f"missing user section {section_name}")
                 section=u_section
                 self.selected_profile.modified=True
             u_vers=u_section["version"]
@@ -103,20 +104,23 @@ class mapper():
                 (a,a_idx)=self.u_map.get_action(u_section,action["name"],True)
                 if a is None:
                     user_missing.append((section_name,action["name"]))
-                    a=action["key"]
-                # bandaid when only one key is defined. This should be fixed during load instead of here.
-                if type(a) is not list:
-                    k=collections.OrderedDict()
-                    k["name"]="null"
-                    a=[a,k]
-                    self.selected_profile.modified=True
+                    raise Exception(f"section {section_name} no user action {action} user section {u_section}")
+                    a=action
                 try:
                     a_keys=self.action_keys[section_name][action["name"]]
                 except KeyError as e:
                     print(self.action_keys.keys())
                     raise e
-                for col,key in enumerate(a):
-                    k_name=a[col]["name"]
+                ky_dct=a["key"]
+                # bandaid when only one key is defined. This should be fixed during load instead of here.
+                if type(ky_dct) is not list:
+                    ky_dct=[ky_dct,None]
+                    self.selected_profile.modified=True
+                for col,key in enumerate(a_keys):
+                    try:
+                        k_name=ky_dct[col]["name"]
+                    except Exception as e:
+                        k_name="null"
                     if k_name == "null":
                         k_name=""
                     a_keys[col].set(k_name)
@@ -187,13 +191,13 @@ class mapper():
                     self.action_labels[section_name][action["name"]]=ttk.Label(self.section_tabs[s_idx], text=action["name"])
                 self.action_labels[section_name][action["name"]].grid(column=col_st, row=row_n, padx=0, pady=0)
                 #a_label.pack()
-                a=action["key"]
-                if type(a) is not list:
+                ky_dct=action["key"]
+                if type(ky_dct) is not list:
                     k=collections.OrderedDict()
                     k["name"]="null"
-                    a=[a,k]
+                    ky_dct=[ky_dct,k]
                 a_keys=[]
-                for col,key in enumerate(a):
+                for col,key in enumerate(ky_dct):
                     k_name=key["name"]
                     if k_name == "null":
                         k_name=""
