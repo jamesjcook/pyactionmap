@@ -1,6 +1,7 @@
 import collections
 from pathlib import Path
 import os
+import xmltodict
 
 def elem2dict(node, attributes=True):
     """
@@ -69,11 +70,28 @@ class profile():
         self.name=profile.get_profile_name(self.dir)
         self.xml_actionmaps=Path(f"{self.dir}/actionmaps.xml")
         self.actionmaps=actionmaps()
-        self.backup_dir=Path(f"{self.dir}/backups")
+        self.backup_dir=Path(f"{self.dir}/backup")
 
     def get_profile_name(profile_dir):
-        # placeholder function to get the profile name given a profile dir.
-        return os.path.basename(profile_dir)
+        # function to get the profile name given a profile dir.
+        profile_name=None
+        # the profile xml is very simple, it should have a single "Profile" element with one "Name" attribute.
+        with open(Path(f"{profile_dir}/profile.xml")) as file_h:
+            profile_dict=xmltodict.parse(file_h.read(),attr_prefix=actionmaps.attr_prefix)
+        pkey=profile_dict.keys()
+        if len(pkey)==1:
+            pkey=list(pkey)[0]
+        if type(pkey) is not list and pkey.lower() == "profile":
+            p_dict=profile_dict[pkey]
+        nkey=p_dict.keys()
+        if len(nkey)==1:
+            nkey=list(nkey)[0]
+        if type(nkey) is not list and nkey.lower() == "name":
+            profile_name=p_dict[nkey]
+        if profile_name is None:
+            print("Error getting profile name, assuming directory is good enough")
+            profile_name = os.path.basename(profile_dir)
+        return profile_name
 
     def load_actionmaps(self,validator=None):
         # this NOT loaded on init because we might want to slip in an alternate xml_path for xml_actionmaps
