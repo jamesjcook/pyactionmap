@@ -81,6 +81,8 @@ class mapper():
         self.selected_profile.load_actionmaps(mapper.dtd_actionmap)
         self.profile_name.set(f"Profile name = {self.selected_profile.name}")
         self.u_map=self.selected_profile.actionmaps
+        if not self.u_map.xml_valid:
+            print(f"Warning: XML NOT valid!, take care when modifiying XML!, will give this our best try")
         user_missing=[]
         for s_idx,section_name in enumerate(self.tab_names):
             (section,map_s_idx)=self.default_map.get_section(section_name)
@@ -104,14 +106,19 @@ class mapper():
                 (a,a_idx)=self.u_map.get_action(u_section,action["name"],True)
                 if a is None:
                     user_missing.append((section_name,action["name"]))
-                    raise Exception(f"section {section_name} no user action {action} user section {u_section}")
+                    #raise Exception(f"section {section_name} no user action {action} user section {u_section}")
                     a=action
+                try:
+                    ky_dct=a["key"]
+                except Exception as e:
+                    print(f"Invalid action! {a}. Substituting default data!")
+                    a=action
+                    ky_dct=a["key"]
                 try:
                     a_keys=self.action_keys[section_name][action["name"]]
                 except KeyError as e:
                     print(self.action_keys.keys())
                     raise e
-                ky_dct=a["key"]
                 # bandaid when only one key is defined. This should be fixed during load instead of here.
                 if type(ky_dct) is not list:
                     ky_dct=[ky_dct,None]
@@ -123,6 +130,10 @@ class mapper():
                         k_name="null"
                     if k_name == "null":
                         k_name=""
+                    if k_name != a_keys[col].get():
+                        # TODO: Some how add feedback that the user key is not default, and potentially offer a set-default button?
+                        # print(f"User key {action['name']}{col+1} is not default")
+                        pass
                     a_keys[col].set(k_name)
         if len(user_missing):
             print("These actions were not defined by the user, and will be updated with the default values:")
@@ -201,7 +212,7 @@ class mapper():
                     k_name=key["name"]
                     if k_name == "null":
                         k_name=""
-                    tvar=tk.IntVar()
+                    tvar=tk.StringVar()
                     tvar.set(k_name)
                     a_keys.append(tvar)
                     # Text entry is NOT the correct thing. It would probably be better to use a button which after clicking waited for user entered key.
