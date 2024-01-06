@@ -111,7 +111,7 @@ class actionmaps(collections.OrderedDict):
         # find section with the name, raise ValueError if not found.
         # can use missing_ok=True to avoid error
         for idx,section in enumerate(self[actionmaps.top_key]["actionmap"]):
-            if lookup in section["name"]:
+            if lookup == section["name"]:
                 return section,idx
         if not missing_ok:
             raise ValueError(f"no {lookup} found")
@@ -123,7 +123,7 @@ class actionmaps(collections.OrderedDict):
         if type(section) == str:
             section,s_idx=self.get_section(section)
         for idx,a in enumerate(section["action"]):
-            if lookup in a["name"]:
+            if lookup == a["name"]:
                 return a,idx
         if not missing_ok:
             raise ValueError(f"no {lookup} found in {section['name']}")
